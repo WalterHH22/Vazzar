@@ -61,4 +61,20 @@ public class CloudDataSourceConfig {
         config.setDriverClassName("org.postgresql.Driver");
         return new HikariDataSource(config);
     }
+
+    @Bean
+    public org.springframework.beans.factory.config.BeanPostProcessor flywayRepairPostProcessor() {
+        return new org.springframework.beans.factory.config.BeanPostProcessor() {
+            @Override
+            public Object postProcessBeforeInitialization(Object bean, String beanName) {
+                if (bean instanceof org.flywaydb.core.Flyway flyway) {
+                    try {
+                        flyway.repair();
+                    } catch (Exception ignored) {
+                    }
+                }
+                return bean;
+            }
+        };
+    }
 }

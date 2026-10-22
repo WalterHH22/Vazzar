@@ -2,6 +2,46 @@
 -- V11_0 | Seed: Ampliación del Catálogo de Productos por Categoría
 -- =====================================================================
 
+-- 0. Garantizar existencia de empresa principal y categorías base para cumplir FKs
+INSERT INTO inventory.company (id, user_id, name, tax_id, fiscal_address, phone, created_at)
+VALUES (
+    '11111111-1111-1111-1111-111111111111',
+    '00000000-0000-0000-0000-000000000001',
+    'Empresa Principal Vazzar',
+    '0614-010190-101-1',
+    'San Salvador, El Salvador',
+    '+503 2222-0000',
+    now()
+) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO fair.company (id, name, logo_url, contact)
+VALUES (
+    '11111111-1111-1111-1111-111111111111',
+    'Empresa Principal Vazzar',
+    NULL,
+    '+503 2222-0000'
+) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO inventory.category (id, name, created_at, updated_at)
+VALUES 
+    ('22222222-2222-2222-2222-222222222221', 'Calzado y Zapatillas', now(), now()),
+    ('22222222-2222-2222-2222-222222222222', 'Ropa y Moda', now(), now()),
+    ('22222222-2222-2222-2222-222222222223', 'Café y Gourmet', now(), now()),
+    ('22222222-2222-2222-2222-222222222224', 'Accesorios y Joyería', now(), now()),
+    ('7d1f631b-9a13-49af-93fd-6bcf527e9ed5', 'Tecnología', now(), now()),
+    ('5bf42a59-6a32-4e56-8998-d7af166d3766', 'Iluminación', now(), now())
+ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
+
+INSERT INTO ecommerce.category (id, name)
+VALUES 
+    ('22222222-2222-2222-2222-222222222221', 'Calzado y Zapatillas'),
+    ('22222222-2222-2222-2222-222222222222', 'Ropa y Moda'),
+    ('22222222-2222-2222-2222-222222222223', 'Café y Gourmet'),
+    ('22222222-2222-2222-2222-222222222224', 'Accesorios y Joyería'),
+    ('7d1f631b-9a13-49af-93fd-6bcf527e9ed5', 'Tecnología'),
+    ('5bf42a59-6a32-4e56-8998-d7af166d3766', 'Iluminación')
+ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
+
 -- 1. Normalización de nombres de categorías con acentos limpios
 UPDATE inventory.category SET name = 'Café y Gourmet' WHERE id = '22222222-2222-2222-2222-222222222223';
 UPDATE ecommerce.category SET name = 'Café y Gourmet' WHERE id = '22222222-2222-2222-2222-222222222223';
