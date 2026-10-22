@@ -22,14 +22,14 @@ VALUES (
     '+503 2222-0000'
 ) ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO inventory.category (id, name, created_at, updated_at)
+INSERT INTO inventory.category (id, name)
 VALUES 
-    ('22222222-2222-2222-2222-222222222221', 'Calzado y Zapatillas', now(), now()),
-    ('22222222-2222-2222-2222-222222222222', 'Ropa y Moda', now(), now()),
-    ('22222222-2222-2222-2222-222222222223', 'Café y Gourmet', now(), now()),
-    ('22222222-2222-2222-2222-222222222224', 'Accesorios y Joyería', now(), now()),
-    ('7d1f631b-9a13-49af-93fd-6bcf527e9ed5', 'Tecnología', now(), now()),
-    ('5bf42a59-6a32-4e56-8998-d7af166d3766', 'Iluminación', now(), now())
+    ('22222222-2222-2222-2222-222222222221', 'Calzado y Zapatillas'),
+    ('22222222-2222-2222-2222-222222222222', 'Ropa y Moda'),
+    ('22222222-2222-2222-2222-222222222223', 'Café y Gourmet'),
+    ('22222222-2222-2222-2222-222222222224', 'Accesorios y Joyería'),
+    ('7d1f631b-9a13-49af-93fd-6bcf527e9ed5', 'Tecnología'),
+    ('5bf42a59-6a32-4e56-8998-d7af166d3766', 'Iluminación')
 ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
 
 INSERT INTO ecommerce.category (id, name)
