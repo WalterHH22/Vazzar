@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vazzar — Panel de Control de Módulos (DDD)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: rgba(23, 31, 51, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-primary: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-success: #10b981;
+      --accent-danger: #ef4444;
+      --accent-warning: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: radial-gradient(circle at 15% 15%, #1e1b4b 0%, var(--bg) 50%, #030712 100%);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.4rem;
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+    }
+
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(to right, #ffffff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 0.15rem;
+    }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 1.15rem 1.4rem;
+      backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stat-card .label {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    .stat-card .val {
+      font-size: 1.85rem;
+      font-weight: 800;
+    }
+
+    .stat-card.online .val { color: var(--accent-success); }
+    .stat-card.offline .val { color: var(--accent-danger); }
+
+    .quick-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 0.65rem 1.25rem;
+      border-radius: 9px;
+      border: 1px solid var(--card-border);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .module-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 1.6rem;
+      backdrop-filter: blur(16px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .module-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--accent-danger);
+      transition: background 0.3s ease;
+    }
+
+    .module-card.is-active::before {
+      background: linear-gradient(90deg, var(--accent-success), #34d399);
+    }
+
+    .module-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+
+    .module-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .badge-group {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-top: 0.4rem;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-schema {
+      background: rgba(99, 102, 241, 0.15);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      font-family: var(--font-mono);
+    }
+
+    .badge-type {
+      background: rgba(255, 255, 255, 0.07);
+      color: #cbd5e1;
+    }
+
+    .badge-type.core {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    /* Switch */
+    .switch-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 28px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #334155;
+      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 34px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    input:checked + .slider {
+      background-color: var(--accent-success);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    .status-text {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .status-text.active { color: var(--accent-success); }
+    .status-text.inactive { color: var(--accent-danger); }
+
+    .card-meta {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin: 0.85rem 0 1.25rem 0;
+      flex-grow: 1;
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+    }
+
+    .card-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .test-output {
+      margin-top: 0.85rem;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      max-height: 160px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      display: none;
+    }
+
+    .test-output.show {
+      display: block;
+    }
+
+    .architecture-box {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .architecture-box h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.6rem;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .architecture-box p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    .architecture-box code {
+      font-family: var(--font-mono);
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      color: #93c5fd;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      padding: 0.9rem 1.4rem;
+      background: #1e293b;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      color: #fff;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="brand">
+      <div class="logo-badge">V</div>
+      <div>
+        <h1>Vazzar — Panel de Control de Módulos</h1>
+        <div class="subtitle">Domain-Driven Design (DDD) • Arquitectura Hexagonal • Bounded Contexts</div>
+      </div>
+    </div>
+    <div style="display: flex; gap: 0.6rem;">
+      <a href="/login" class="btn btn-primary">
+        🔐 Ir a Login / Registro
+      </a>
+      <a href="/api/admin/modules" target="_blank" class="btn">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+        Ver JSON API
+      </a>
+    </div>
+  </header>
+
+  <!-- Barra de Estadísticas -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div>
+        <div class="label">Total Bounded Contexts</div>
+        <div class="val" id="totalModules">5</div>
+      </div>
+    </div>
+    <div class="stat-card online">
+      <div>
+        <div class="label">Módulos Encendidos</div>
+        <div class="val" id="activeModules">0</div>
+      </div>
+    </div>
+    <div class="stat-card offline">
+      <div>
+        <div class="label">Módulos Apagados</div>
+        <div class="val" id="inactiveModules">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones de Acción Rápida -->
+  <div class="quick-actions">
+    <button class="btn btn-primary" onclick="bulkAction('enable-all')">
+      ⚡ Encender Todos
+    </button>
+    <button class="btn" onclick="bulkAction('disable-all')">
+      🔌 Apagar Todos
+    </button>
+    <button class="btn" onclick="loadModules()">
+      🔄 Refrescar Estado
+    </button>
+  </div>
+
+  <!-- Cuadrícula de Módulos -->
+  <div class="modules-grid" id="modulesGrid">
+    <!-- Renderizado dinámico -->
+  </div>
+
+  <!-- Explicación Técnica -->
+  <div class="architecture-box">
+    <h3>💡 ¿Cómo funciona el encendido y apagado de módulos en Vazzar?</h3>
+    <p>
+      Cada <strong>Bounded Context</strong> (<code>identity</code>, <code>inventory</code>, <code>billing</code>, <code>ecommerce</code>, <code>fair</code>) posee su propio esquema de PostgreSQL aislado y su propia arquitectura hexagonal (dominio, aplicación, infraestructura).
+    </p>
+    <p style="margin-top: 0.5rem;">
+      Cuando un módulo es <strong>APAGADO</strong>, el interceptor central de Spring Boot bloquea inmediatamente el acceso a sus rutas con un código <code>HTTP 503 Service Unavailable</code> sin procesar peticiones ni tocar la base de datos. Al <strong>ENCENDERLO</strong>, sus endpoints y servicios vuelven a responder con normalidad en tiempo real.
+    </p>
+  </div>
+</div>
+
+<div class="toast" id="toast">Notificación</div>
+
+<script>
+  let modulesData = [];
+
+  async function loadModules() {
+    try {
+      const res = await fetch('/api/admin/modules');
+      modulesData = await res.json();
+      render();
+    } catch (err) {
+      showToast('Error cargando módulos: ' + err.message);
+    }
+  }
+
+  function render() {
+    const grid = document.getElementById('modulesGrid');
+    grid.innerHTML = '';
+
+    let activeCount = 0;
+
+    modulesData.forEach(m => {
+      if (m.enabled) activeCount++;
+
+      const isCore = m.contextType === 'Core';
+      const card = document.createElement('div');
+      card.className = `module-card ${m.enabled ? 'is-active' : ''}`;
+      card.id = `card-${m.id}`;
+
+      card.innerHTML = `
+        <div class="card-header">
+          <div>
+            <div class="module-title">${m.displayName}</div>
+            <div class="badge-group">
+              <span class="badge badge-schema">schema: ${m.schema}</span>
+              <span class="badge badge-type ${isCore ? 'core' : ''}">${m.contextType}</span>
+            </div>
+          </div>
+          <div class="switch-wrap">
+            <label class="switch">
+              <input type="checkbox" ${m.enabled ? 'checked' : ''} onchange="toggleModule('${m.id}')">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card-meta">
+          <div class="meta-row">
+            <span>Ruta Base:</span>
+            <code>${m.basePath}</code>
+          </div>
+          <div class="meta-row">
+            <span>Tablas BD:</span>
+            <span>${(m.metadata?.tables || []).join(', ') || 'N/A'}</span>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <span class="status-text ${m.enabled ? 'active' : 'inactive'}" id="status-text-${m.id}">
+            ${m.enabled ? '🟢 ENCENDIDO' : '🔴 APAGADO'}
+          </span>
+          <button class="btn" style="padding: 0.45rem 0.85rem; font-size: 0.78rem;" onclick="testEndpoint('${m.id}', '${m.testEndpoint}')">
+            Probar Endpoint
+          </button>
+        </div>
+
+        <div class="test-output" id="output-${m.id}"></div>
+      `;
+
+      grid.appendChild(card);
+    });
+
+    document.getElementById('totalModules').textContent = modulesData.length;
+    document.getElementById('activeModules').textContent = activeCount;
+    document.getElementById('inactiveModules').textContent = modulesData.length - activeCount;
+  }
+
+  async function toggleModule(moduleId) {
+    try {
+      const res = await fetch(`/api/admin/modules/${moduleId}/toggle`, {
+        method: 'PATCH'
+      });
+      const data = await res.json();
+      showToast(data.message);
+      await loadModules();
+    } catch (err) {
+      showToast('Error al alternar estado: ' + err.message);
+    }
+  }
+
+  async function bulkAction(action) {
+    try {
+      const res = await fetch(`/api/admin/modules/bulk/${action}`, {
+        method: 'POST'
+      });
+      const data = await res.json();
+      showToast(data.message);
+      await loadModules();
+    } catch (err) {
+      showToast('Error en acción masiva: ' + err.message);
+    }
+  }
+
+  async function testEndpoint(moduleId, endpoint) {
+    const outBox = document.getElementById(`output-${moduleId}`);
+    outBox.className = 'test-output show';
+    outBox.textContent = `Consultando ${endpoint}...`;
+
+    try {
+      const res = await fetch(endpoint);
+      const isJson = (res.headers.get('content-type') || '').includes('json');
+      const data = isJson ? await res.json() : await res.text();
+
+      const statusBadge = res.ok ? '✅ ' + res.status + ' OK' : '⚠️ ' + res.status + ' ' + res.statusText;
+      outBox.textContent = `${statusBadge}\n${typeof data === 'object' ? JSON.stringify(data, null, 2) : data}`;
+    } catch (err) {
+      outBox.textContent = `❌ Error de conexión: ${err.message}`;
+    }
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className = 'toast show';
+    setTimeout(() => {
+      toast.className = 'toast';
+    }, 3200);
+  }
+
+  loadModules();
+</script>
+
+</body>
+</html>

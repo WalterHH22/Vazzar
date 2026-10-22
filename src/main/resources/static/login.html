@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vazzar — Autenticación (Login & Registro)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: rgba(23, 31, 51, 0.85);
+      --card-border: rgba(255, 255, 255, 0.09);
+      --accent-primary: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-success: #10b981;
+      --accent-danger: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: radial-gradient(circle at 80% 20%, #1e1b4b 0%, var(--bg) 60%, #030712 100%);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.5rem 1.25rem;
+    }
+
+    .nav-bar {
+      width: 100%;
+      max-width: 540px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .logo-badge {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.4rem 0.85rem;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 2.2rem;
+      width: 100%;
+      max-width: 540px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .tabs {
+      display: flex;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 12px;
+      padding: 0.3rem;
+      margin-bottom: 1.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.65rem;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--accent-primary);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 0.45rem;
+    }
+
+    input, select {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 0.92rem;
+      transition: border-color 0.2s ease;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      border: none;
+      color: #fff;
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.85rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);
+      margin-top: 0.5rem;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.5);
+    }
+
+    .quick-seed {
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .quick-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 0.65rem;
+    }
+
+    .quick-pills {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .pill-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pill-btn:hover {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: var(--accent-primary);
+      color: #fff;
+    }
+
+    .result-box {
+      margin-top: 1.5rem;
+      padding: 1.2rem;
+      border-radius: 12px;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-box.success {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      display: block;
+    }
+
+    .result-box.error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      display: block;
+    }
+
+    .token-text {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      word-break: break-all;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.6rem;
+      border-radius: 6px;
+      margin: 0.6rem 0;
+      color: #a5b4fc;
+      max-height: 80px;
+      overflow-y: auto;
+    }
+
+    .btn-copy {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-copy:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="nav-bar">
+    <a href="/admin/modules" class="brand">
+      <div class="logo-badge">V</div>
+      <div class="brand-title">Vazzar</div>
+    </a>
+    <a href="/admin/modules" class="nav-link">← Panel de Módulos</a>
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">Iniciar Sesión</button>
+      <button class="tab-btn" id="tabRegister" onclick="switchTab('register')">Registrarse</button>
+    </div>
+
+    <!-- Formulario de LOGIN -->
+    <form id="formLogin" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label for="loginEmail">Correo Electrónico</label>
+        <input type="email" id="loginEmail" placeholder="ejemplo@vazzar.com" required value="seller@vazzar.com">
+      </div>
+      <div class="form-group">
+        <label for="loginPassword">Contraseña</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required value="seller123">
+      </div>
+      <button type="submit" class="btn-submit">Entrar al Sistema</button>
+
+      <!-- Usuarios Semilla -->
+      <div class="quick-seed">
+        <div class="quick-title">Usuarios de prueba precargados en PostgreSQL:</div>
+        <div class="quick-pills">
+          <button type="button" class="pill-btn" onclick="fillLogin('seller@vazzar.com', 'seller123')">Vendedor (seller)</button>
+          <button type="button" class="pill-btn" onclick="fillLogin('buyer@vazzar.com', 'buyer123')">Comprador (buyer)</button>
+          <button type="button" class="pill-btn" onclick="fillLogin('admin@vazzar.com', 'admin123')">Admin (admin)</button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Formulario de REGISTRO -->
+    <form id="formRegister" style="display: none;" onsubmit="handleRegister(event)">
+      <div class="form-group">
+        <label for="regEmail">Correo Electrónico</label>
+        <input type="email" id="regEmail" placeholder="nuevo.usuario@empresa.com" required>
+      </div>
+      <div class="form-group">
+        <label for="regPassword">Contraseña (Mínimo 6 caracteres)</label>
+        <input type="password" id="regPassword" placeholder="••••••••" required minlength="6">
+      </div>
+      <div class="form-group">
+        <label for="regRole">Rol del Usuario</label>
+        <select id="regRole">
+          <option value="seller">Vendedor (Empresa / Emprendedor)</option>
+          <option value="buyer">Comprador</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-submit" style="background: linear-gradient(135deg, #10b981, #059669);">Crear Cuenta</button>
+    </form>
+
+    <!-- Cuadro de Resultados -->
+    <div id="resultBox" class="result-box"></div>
+  </div>
+
+  <script>
+    function switchTab(tab) {
+      const isLogin = tab === 'login';
+      document.getElementById('tabLogin').className = `tab-btn ${isLogin ? 'active' : ''}`;
+      document.getElementById('tabRegister').className = `tab-btn ${!isLogin ? 'active' : ''}`;
+      document.getElementById('formLogin').style.display = isLogin ? 'block' : 'none';
+      document.getElementById('formRegister').style.display = !isLogin ? 'block' : 'none';
+      document.getElementById('resultBox').className = 'result-box';
+    }
+
+    function fillLogin(email, password) {
+      document.getElementById('loginEmail').value = email;
+      document.getElementById('loginPassword').value = password;
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const res = await fetch('/api/identity/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          showSuccess('¡Inicio de sesión exitoso!', data);
+        } else {
+          showError(data.message || 'Error en autenticación');
+        }
+      } catch (err) {
+        showError('Error de conexión con el backend: ' + err.message);
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const email = document.getElementById('regEmail').value;
+      const password = document.getElementById('regPassword').value;
+      const role = document.getElementById('regRole').value;
+
+      try {
+        const res = await fetch('/api/identity/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, role })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          showSuccess('¡Usuario registrado con éxito en PostgreSQL!', data);
+        } else {
+          showError(data.message || 'Error al registrar usuario');
+        }
+      } catch (err) {
+        showError('Error de conexión con el backend: ' + err.message);
+      }
+    }
+
+    function showSuccess(title, data) {
+      const box = document.getElementById('resultBox');
+      box.className = 'result-box success';
+      box.innerHTML = `
+        <div style="font-weight: 700; color: #34d399; margin-bottom: 0.35rem;">✅ ${title}</div>
+        <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+          <strong>Email:</strong> ${data.email} | <strong>Rol:</strong> <span style="text-transform: uppercase;">${data.role}</span>
+        </div>
+        <div style="font-size: 0.85rem; color: #cbd5e1;"><strong>User ID (UUID):</strong> <code>${data.userId}</code></div>
+        <div style="margin-top: 0.6rem; font-size: 0.78rem; font-weight: 600; color: #94a3b8;">TOKEN JWT EMITIDO:</div>
+        <div class="token-text" id="tokenVal">${data.token}</div>
+        <button class="btn-copy" onclick="copyToken()">Copiar Token</button>
+      `;
+    }
+
+    function showError(msg) {
+      const box = document.getElementById('resultBox');
+      box.className = 'result-box error';
+      box.innerHTML = `
+        <div style="font-weight: 700; color: #f87171;">❌ ${msg}</div>
+      `;
+    }
+
+    function copyToken() {
+      const token = document.getElementById('tokenVal').textContent;
+      navigator.clipboard.writeText(token);
+      alert('Token JWT copiado al portapapeles');
+    }
+  </script>
+</body>
+</html>
