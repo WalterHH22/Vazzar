@@ -35,4 +35,9 @@ public class EcommerceCategoryRepositoryAdapter implements EcommerceCategoryRepo
                 .map(e -> new EcommerceCategory(e.getId(), e.getName()))
                 .toList();
     }
+
+    @Override
+    public void deleteById(UUID id) {
+        jpaRepository.deleteById(id);
+    }
 }

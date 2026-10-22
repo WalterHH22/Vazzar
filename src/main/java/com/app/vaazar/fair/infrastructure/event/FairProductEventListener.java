@@ -5,6 +5,7 @@ import com.app.vaazar.fair.infrastructure.persistence.FairProductJpaEntity;
 import com.app.vaazar.fair.infrastructure.persistence.SpringDataFairCompanyRepository;
 import com.app.vaazar.fair.infrastructure.persistence.SpringDataFairProductRepository;
 import com.app.vaazar.inventory.domain.event.ProductCreatedEvent;
+import com.app.vaazar.inventory.domain.event.ProductDeletedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -58,5 +59,15 @@ public class FairProductEventListener {
 
         productRepository.save(product);
         log.info("[FAIR-EVENT] Producto sincronizado con éxito en 'fair.product'");
+    }
+
+    @EventListener
+    @Transactional
+    public void onProductDeleted(ProductDeletedEvent event) {
+        log.info("[FAIR-EVENT] Eliminando producto desde Inventory si existe -> id: {}", event.getProductId());
+        if (productRepository.existsById(event.getProductId())) {
+            productRepository.deleteById(event.getProductId());
+            log.info("[FAIR-EVENT] Producto eliminado de 'fair.product'");
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.app.vaazar.inventory.application.usecase;
 
 import com.app.vaazar.inventory.domain.event.ProductCreatedEvent;
+import com.app.vaazar.inventory.domain.event.ProductDeletedEvent;
 import com.app.vaazar.inventory.infrastructure.persistence.InventoryCompanyJpaEntity;
 import com.app.vaazar.inventory.infrastructure.persistence.InventoryProductJpaEntity;
 import com.app.vaazar.inventory.infrastructure.persistence.SpringDataInventoryCompanyRepository;
@@ -80,5 +81,13 @@ public class ProductService {
 
     public List<InventoryProductJpaEntity> listAll() {
         return productRepository.findAll();
+    }
+
+    @Transactional
+    public void deleteProduct(UUID productId) {
+        if (productRepository.existsById(productId)) {
+            productRepository.deleteById(productId);
+            eventPublisher.publishEvent(new ProductDeletedEvent(productId));
+        }
     }
 }

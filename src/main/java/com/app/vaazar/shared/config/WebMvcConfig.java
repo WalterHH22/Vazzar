@@ -3,8 +3,12 @@ package com.app.vaazar.shared.config;
 import com.app.vaazar.shared.module.ModuleGuardInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
@@ -19,7 +23,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(moduleGuardInterceptor)
                 .addPathPatterns("/api/**")
-                .excludePathPatterns("/api/admin/**");
+                .excludePathPatterns("/api/admin/**", "/api/upload/**");
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        Path uploadDir = Paths.get("uploads").toAbsolutePath();
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations(uploadDir.toUri().toString());
     }
 
     @Override

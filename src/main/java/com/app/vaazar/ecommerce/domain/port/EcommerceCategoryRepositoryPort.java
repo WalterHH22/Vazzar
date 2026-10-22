@@ -10,4 +10,5 @@ public interface EcommerceCategoryRepositoryPort {
     EcommerceCategory save(EcommerceCategory category);
     Optional<EcommerceCategory> findById(UUID id);
     List<EcommerceCategory> findAll();
+    void deleteById(UUID id);
 }

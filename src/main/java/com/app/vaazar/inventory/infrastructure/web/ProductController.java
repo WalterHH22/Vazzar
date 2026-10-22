@@ -31,4 +31,10 @@ public class ProductController {
     public ResponseEntity<List<InventoryProductJpaEntity>> listAll() {
         return ResponseEntity.ok(productService.listAll());
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") java.util.UUID id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
+    }
 }

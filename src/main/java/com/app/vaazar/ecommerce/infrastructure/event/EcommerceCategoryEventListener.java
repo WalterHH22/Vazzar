@@ -3,6 +3,7 @@ package com.app.vaazar.ecommerce.infrastructure.event;
 import com.app.vaazar.ecommerce.domain.model.EcommerceCategory;
 import com.app.vaazar.ecommerce.domain.port.EcommerceCategoryRepositoryPort;
 import com.app.vaazar.inventory.domain.event.CategoryCreatedEvent;
+import com.app.vaazar.inventory.domain.event.CategoryDeletedEvent;
 import com.app.vaazar.inventory.domain.event.CategoryUpdatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,5 +44,13 @@ public class EcommerceCategoryEventListener {
         repositoryPort.save(category);
 
         log.info("[ECOMMERCE-EVENT] Actualización exitosa en esquema 'ecommerce.category'");
+    }
+
+    @EventListener
+    @Transactional
+    public void onCategoryDeleted(CategoryDeletedEvent event) {
+        log.info("[ECOMMERCE-EVENT] Eliminando categoría desde Inventory -> id: {}", event.getCategoryId());
+        repositoryPort.deleteById(event.getCategoryId());
+        log.info("[ECOMMERCE-EVENT] Eliminación exitosa en esquema 'ecommerce.category'");
     }
 }

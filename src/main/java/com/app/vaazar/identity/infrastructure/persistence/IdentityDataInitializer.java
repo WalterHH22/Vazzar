@@ -31,6 +31,12 @@ public class IdentityDataInitializer implements CommandLineRunner {
         seedUserIfNotExists("admin@vazzar.com", "admin123", UserRole.ADMIN);
         seedUserIfNotExists("seller@vazzar.com", "seller123", UserRole.SELLER);
         seedUserIfNotExists("buyer@vazzar.com", "buyer123", UserRole.BUYER);
+
+        // Comerciantes y Vendedores de la Feria Virtual
+        seedUserIfNotExists("harold_orellana@siman.com", "admin123", UserRole.SELLER);
+        seedUserIfNotExists("calzado@vazzar.com", "seller123", UserRole.SELLER);
+        seedUserIfNotExists("cafegourmet@vazzar.com", "seller123", UserRole.SELLER);
+        seedUserIfNotExists("moda@vazzar.com", "seller123", UserRole.SELLER);
     }
 
     private void seedUserIfNotExists(String email, String rawPassword, UserRole role) {

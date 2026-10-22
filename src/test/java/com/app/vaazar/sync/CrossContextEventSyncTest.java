@@ -12,7 +12,9 @@ import com.app.vaazar.fair.infrastructure.persistence.FairProductJpaEntity;
 import com.app.vaazar.fair.infrastructure.persistence.SpringDataFairCompanyRepository;
 import com.app.vaazar.fair.infrastructure.persistence.SpringDataFairProductRepository;
 import com.app.vaazar.inventory.domain.event.CategoryCreatedEvent;
+import com.app.vaazar.inventory.domain.event.CategoryDeletedEvent;
 import com.app.vaazar.inventory.domain.event.ProductCreatedEvent;
+import com.app.vaazar.inventory.domain.event.ProductDeletedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -109,5 +111,37 @@ class CrossContextEventSyncTest {
         // Fair listener debe ignorarlo
         fairProductListener.onProductCreated(event);
         verify(fairProductRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldDeleteCategoryInEcommerceWhenDeletedInInventory() {
+        UUID categoryId = UUID.randomUUID();
+        CategoryDeletedEvent event = new CategoryDeletedEvent(categoryId);
+
+        ecommerceCategoryListener.onCategoryDeleted(event);
+
+        verify(ecommerceCategoryRepository, times(1)).deleteById(categoryId);
+    }
+
+    @Test
+    void shouldDeleteProductInEcommerceWhenDeletedInInventory() {
+        UUID productId = UUID.randomUUID();
+        ProductDeletedEvent event = new ProductDeletedEvent(productId);
+
+        ecommerceProductListener.onProductDeleted(event);
+
+        verify(ecommerceProductRepository, times(1)).deleteById(productId);
+    }
+
+    @Test
+    void shouldDeleteProductInFairWhenDeletedInInventory() {
+        UUID productId = UUID.randomUUID();
+        ProductDeletedEvent event = new ProductDeletedEvent(productId);
+
+        when(fairProductRepository.existsById(productId)).thenReturn(true);
+
+        fairProductListener.onProductDeleted(event);
+
+        verify(fairProductRepository, times(1)).deleteById(productId);
     }
 }

@@ -21,6 +21,7 @@ public class SecurityConfig {
                     "/admin/**",
                     "/modules/**",
                     "/api/**",
+                    "/uploads/**",
                     "/*.html",
                     "/*.css",
                     "/*.js",
